@@ -35,7 +35,7 @@ classdef InvertedPendulum
             %calculate the coef matrix:
             d = obj.I*(obj.M + obj.m) + obj.M*obj.m*obj.l^2;
             obj.A = [0 1 0 0;
-                0 -(obj.I+obj.m*obj.l^2)*obj.b/d (obj.m^2*obj.g*obj.l^2)/d 0;
+                0 -(obj.I+obj.m*obj.l^2)*obj.b/d -(obj.m^2*obj.g*obj.l^2)/d 0;
                 0 0 0 1;
                 0 -obj.m*obj.l*obj.b/d obj.m*obj.g*obj.l*(obj.M+obj.m)/d 0
                 ];
