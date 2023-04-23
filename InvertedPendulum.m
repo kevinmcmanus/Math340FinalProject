@@ -34,10 +34,10 @@ classdef InvertedPendulum
 
             %calculate the coef matrix:
             d = obj.I*(obj.M + obj.m) + obj.M*obj.m*obj.l^2;
-            obj.A = [0 1 0 0;
-                0 -(obj.I+obj.m*obj.l^2)*obj.b/d -(obj.m^2*obj.g*obj.l^2)/d 0;
-                0 0 0 1;
-                0 -obj.m*obj.l*obj.b/d obj.m*obj.g*obj.l*(obj.M+obj.m)/d 0
+            obj.A = [0, 1, 0,  0;
+                0, -(obj.I+obj.m*obj.l^2)*obj.b/d, -(obj.m^2*obj.g*obj.l^2)/d, 0;
+                0, 0, 0, 1;
+                0, -obj.m*obj.l*obj.b/d, obj.m*obj.g*obj.l*(obj.M+obj.m)/d, 0
                 ];
             % constant (col) vector
             obj.B = [0; (obj.I+obj.m*obj.l^2)/d; 0; obj.m*obj.l/d];
@@ -54,25 +54,34 @@ classdef InvertedPendulum
                 options.time = [0:0.01:3]
                 options.lqr = false;
                 %lqr parameters
-                options.R = 1; % eye(4)
-                options.Q = [1 0 0 0; 0 0 0 0; 0 0 1 0; 0 0 0 0]
-                options.N = 0.0 %zeros(4,1)
+                options.R =  1
+                options.Q = eye(4)
+                options.N = [1; 0; 0; 0]
+                options.description = 'Simulation'
+                options.negatePhiPrime = false
             end
             nsteps = size(options.time,2);
             time_t = options.time;
 
             %constant vector:
-            Bu = obj.B * F;
+            u = F;
 
             %initialize output arrays
             Vt = zeros(size(V0,1), nsteps);
             Vt(:,1) = V0;
             % incremental cost
             dC = zeros(1, nsteps);
+            ut = zeros(1, nsteps);
+            ut(1) = u;
 
             if options.lqr
                 Q = options.Q; R=options.R; N=options.N;
-                [K, s, p] = lqr(obj.A, Bu, Q, R, N);
+                [K, s, p] = lqr(obj.A, obj.B, Q, R, N);
+            end
+
+            A = obj.A;
+            if options.negatePhiPrime
+                A(3,:) = -1*A(3,:);
             end
 
             %update the output for each time step
@@ -80,9 +89,11 @@ classdef InvertedPendulum
             for i = 2:nsteps
                 % previous state vector
                 lastV = thisV;
+                ut(i) = u;
 
                 % calc the derivative col vector and the new state
-                dV = obj.A*lastV + Bu;
+                Bu = obj.B*u;
+                dV = A*lastV + Bu;
                 dt = time_t(i) - time_t(i-1);
                 thisV = lastV + dV*dt;
 
@@ -91,12 +102,18 @@ classdef InvertedPendulum
 
                 %update the cost and control vectors
                 if options.lqr
-                    dC(i) = thisV'*Q*thisV + Bu'*R*Bu + 2.*(thisV'*N*Bu);
+                    dC(i) = thisV'*Q*thisV + u*u*R + 2.*(thisV'*N*u);
                     u = -K*thisV;
-                    Bu = obj.B*u;
                 end
             end
-            simres = SimResult(Vt, dC, time_t);
+            simres = SimResult(Vt, dC, time_t,F,ut, options.description);
         end
+        function cf = critical_force(obj,V0)
+            cf = [ obj.A(1,:)*V0/obj.B(1,1);
+                   obj.A(2,:)*V0/obj.B(2,1);
+                   obj.A(3,:)*V0/obj.B(3,1);
+                   obj.A(4,:)*V0/obj.B(4,1)];
+        end
+                
     end
 end

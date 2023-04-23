@@ -6,24 +6,67 @@ classdef SimResult
         Vt
         dC
         time_t
+        force
+        ut
+        description
     end
 
     methods
-        function obj = SimResult(Vt,dC, time_t)
+        function obj = SimResult(Vt,dC, time_t,force,ut,description)
             %UNTITLED3 Construct an instance of this class
             %   Detailed explanation goes here
             obj.Vt = Vt;
             obj.time_t = time_t;
             obj.dC = dC;
+            obj.force=force;
+            obj.ut = ut;
+            obj.description = description;
         end
 
         function plotX(obj)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            plot(obj.time_t, obj.Vt(1,:), LineWidth=2)
+            plot(obj.time_t, obj.Vt(1,:), LineWidth=2, ...
+                DisplayName=obj.description)
+            yline(0,HandleVisibility="off");
             title('Displacement v. Time')
             xlabel('Time (s)')
             ylabel('Displacement (m)')
+        end
+
+        function plotF(obj)
+            %METHOD1 Summary of this method goes here
+            %   Detailed explanation goes here
+            plot(obj.time_t, obj.ut, LineWidth=2, ...
+                DisplayName=obj.description)
+            title('Effective Force v. Time')
+            yline(0,HandleVisibility="off");
+            xlabel('Time (s)')
+            ylabel('Force (N)')
+        end
+
+        function plotdC(obj, options)
+            %METHOD1 Summary of this method goes here
+            %   Detailed explanation goes here
+            arguments
+                obj SimResult
+                options.cumulative=false;
+            end
+            if options.cumulative
+                c = cumsum(obj.dC);
+                titlestr = 'Cumulative Cost v. Time';
+                plot(obj.time_t, c, LineWidth=2, ...
+                    DisplayName=obj.description)
+            else
+                titlestr = 'Incremental Cost v. Time';
+                c = obj.dC;
+                semilogy(obj.time_t, c, LineWidth=2, ...
+                    DisplayName=obj.description)
+            end
+
+            title(titlestr)
+            xlabel('Time (s)')
+            ylabel('Cost')
         end
 
         function plotXdX(obj, options)
@@ -44,15 +87,16 @@ classdef SimResult
                 cb.Label.Rotation = -90;
                 cb.Label.VerticalAlignment="bottom";
             end
-            title('Velocity v. Displacement')
+            title('Velocity v. Displacement');
+            subtitle(obj.description);
             xlabel('Displacement (m)')
             ylabel('Velocity (m/s)')
         end
 
-        function animate(obj)
+        function animate(obj, options)
             arguments
                 obj SimResult
-                %options
+                options.xlim = [-8 8];
             end
             Vt = obj.Vt;
 
@@ -67,7 +111,7 @@ classdef SimResult
             x = Vt(1,1);
             cart  = rectangle('Position',[x-0.5*cartl -0.5*carth cartl carth],'Curvature',0.2,'FaceColor','k','EdgeColor','k');
             axis equal;
-            xlim([-15 15]);
+            xlim([options.xlim]);
             ylim([-8 8]);
          
             hold on;
