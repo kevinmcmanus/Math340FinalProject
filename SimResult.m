@@ -143,7 +143,7 @@ classdef SimResult
                 bar  = plot([x barends(1,n)],[0 barends(2,n)],'Linewidth',4,'Color','b');
                 ball  = rectangle('Position',[x+barl*cos(avar)-ballr barl*sin(avar)-ballr 2*ballr 2*ballr],'Curvature',[1 1],'FaceColor','b','EdgeColor','b');
 
-                if mod(n, 10)==0
+                if mod(n, 3)==0
                     pause(0.01);
                     title(sprintf('Time: %f', obj.time_t(n)));
                 end
