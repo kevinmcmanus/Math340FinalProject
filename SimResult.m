@@ -45,6 +45,28 @@ classdef SimResult
             ylabel('Force (N)')
         end
 
+        function plotPhi(obj)
+            %METHOD1 Summary of this method goes here
+            %   Detailed explanation goes here
+            plot(obj.time_t, obj.Vt(3,:), LineWidth=2, ...
+                DisplayName=obj.description)
+            title('Theta v. Time')
+            yline(0,HandleVisibility="off");
+            xlabel('Time (s)')
+            ylabel('Theta (Radian)')
+        end
+
+        function plotdPhi(obj)
+            %METHOD1 Summary of this method goes here
+            %   Detailed explanation goes here
+            plot(obj.time_t, obj.Vt(4,:), LineWidth=2, ...
+                DisplayName=obj.description)
+            title('Angular Velocity v. Time')
+            yline(0,HandleVisibility="off");
+            xlabel('Time (s)')
+            ylabel('Radian per Second')
+        end
+
         function plotdC(obj, options)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
