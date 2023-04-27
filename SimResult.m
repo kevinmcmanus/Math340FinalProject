@@ -53,7 +53,7 @@ classdef SimResult
             title('Tilt Angle Phi v. Time')
             yline(0,HandleVisibility="off");
             xlabel('Time (s)')
-            ylabel('Theta (Radian)')
+            ylabel('Phi (Radian)')
         end
 
         function plotdPhi(obj)
