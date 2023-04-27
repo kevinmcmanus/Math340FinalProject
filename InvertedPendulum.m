@@ -114,6 +114,67 @@ classdef InvertedPendulum
                    obj.A(3,:)*V0/obj.B(3,1);
                    obj.A(4,:)*V0/obj.B(4,1)];
         end
+
+        function simres = nonlinear_method(obj, V0, F, options)
+            arguments
+                obj InvertedPendulum
+                V0(4,1) double {mustBeNumeric}% initial conditions
+                F double % force
+                options.time = [0:0.01:3]
+
+                options.description = 'Simulation'
+                options.negatePhiPrime = false
+            end
+
+            nsteps = size(options.time,2);
+            time_t = options.time;
+
+            % get model properties into local variables
+            M = obj.M; m = obj.m; l = obj.l; g=obj.g; I = obj.I;b=obj.b;
+
+            Vt = zeros(size(V0,1), nsteps);
+            thisV = V0;
+            thisV(3) = pi+thisV(3); % convert to theta from phi
+            Vt(:,1) = thisV;
+            dC = zeros(size(V0,1),nsteps);
+            ut = zeros(size(V0,1),nsteps);
+
+            for i = 2:nsteps
+                % state variables from last time step
+                lastV = thisV;
+                x = lastV(1,1); xprime = lastV(2,1);
+                theta = lastV(3,1); thetaprime = lastV(4,1);
+
+                dt = time_t(i) - time_t(i-1);
+
+                %compute derivative:
+
+                A = M + m;
+                B = m*l*cos(theta);
+                C = m*l*cos(theta);
+                D = I + m*l^2;
+                S = m*l*thetaprime^2*sin(theta)-b*xprime+F;
+                T = -m*g*l*sin(theta);
+
+                xprimeprime =     (S*D-B*T)/(A*D-B*C);
+                thetaprimeprime = (A*T-C*S)/(A*D-B*C);
+
+                dV = [xprime;     ...
+                     xprimeprime; ...
+                     thetaprime;  ...
+                     thetaprimeprime];
+
+                %update the state
+                thisV = lastV + dV*dt;
+                Vt(:,i) = thisV;
+            end
+
+            %convert theta back to phi
+            Vt(3,:) = Vt(3,:) - pi;
+
+            simres = SimResult(Vt, dC, time_t,F,ut, options.description);
+        end
+
                 
     end
 end
