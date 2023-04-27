@@ -50,7 +50,7 @@ classdef SimResult
             %   Detailed explanation goes here
             plot(obj.time_t, obj.Vt(3,:), LineWidth=2, ...
                 DisplayName=obj.description)
-            title('Theta v. Time')
+            title('Tilt Angle Phi v. Time')
             yline(0,HandleVisibility="off");
             xlabel('Time (s)')
             ylabel('Theta (Radian)')
@@ -60,7 +60,7 @@ classdef SimResult
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
             plot(obj.time_t, obj.Vt(4,:), LineWidth=2, ...
-                DisplayName=obj.description)
+                DisplayNPhiame=obj.description)
             title('Angular Velocity v. Time')
             yline(0,HandleVisibility="off");
             xlabel('Time (s)')

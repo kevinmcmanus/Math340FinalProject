@@ -156,13 +156,16 @@ classdef InvertedPendulum
                 S = m*l*thetaprime^2*sin(theta)-b*xprime+F;
                 T = -m*g*l*sin(theta);
 
-                dV = [xprime;             ...
-                     (S*D-B*T)/(A*D-B*C); ...
-                     thetaprime;          ...
-                     (A*T-C*S)/(A*D-B*C)];
+                xprimeprime =     (S*D-B*T)/(A*D-B*C);
+                thetaprimeprime = (A*T-C*S)/(A*D-B*C);
+
+                dV = [xprime;     ...
+                     xprimeprime; ...
+                     thetaprime;  ...
+                     thetaprimeprime];
 
                 %update the state
-                thisV = lastV +dV*dt;
+                thisV = lastV + dV*dt;
                 Vt(:,i) = thisV;
             end
 
