@@ -90,6 +90,23 @@ classdef SimResult
             xlabel('Time (s)')
             ylabel('Cost')
         end
+        function plotu(obj, options)
+            %METHOD1 Summary of this method goes here
+            %   Detailed explanation goes here
+            arguments
+                obj SimResult
+                options.cumulative=false;
+            end
+
+            titlestr = 'Effective Force v. Time';
+            plot(obj.time_t, obj.ut, LineWidth=2, ...
+                DisplayName=obj.description)
+
+
+            title(titlestr)
+            xlabel('Time (s)')
+            ylabel('Force (N)')
+        end
 
         function plotXdX(obj, options)
             %METHOD1 Summary of this method goes here
